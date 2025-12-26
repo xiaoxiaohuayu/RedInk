@@ -1,0 +1,63 @@
+# 产品图生成服务商配置
+# 复制此文件为 product_photo_providers.yaml 并填写你的配置
+# 此配置独立于小红书图文生成的 image_providers.yaml
+
+# 当前激活的服务商（填写下方 providers 中的名称）
+active_provider: openai_compatible
+
+# 服务商列表
+providers:
+  # 通用 OpenAI 兼容接口（推荐，支持多种模型）
+  openai_compatible:
+    type: openai_compatible
+    api_key: sk-xxxxxxxxxxxxxxxxxxxx
+    base_url: https://api.openai.com/v1
+    model: gpt-4o
+    # 功能支持标记
+    supports_background_change: true
+    supports_pose_change: true
+    supports_multi_product: true
+    supports_inpainting: false
+
+  # 可灵虚拟换装（专注服装换装）
+  kolors_virtual_tryon:
+    type: kolors_virtual_tryon
+    api_key: your-kling-api-key
+    base_url: https://api.klingai.com
+    model: kolors-virtual-try-on
+    # 可灵特有参数
+    category: upper_body  # upper_body, lower_body, full_body
+    # 功能支持标记
+    supports_background_change: false
+    supports_pose_change: false
+    supports_multi_product: false
+    supports_inpainting: false
+
+  # Kling AI（功能全面）
+  kling_ai:
+    type: kling_ai
+    api_key: your-kling-api-key
+    base_url: https://api.klingai.com
+    model: kling-v1
+    # Kling 特有参数
+    quality: high
+    # 功能支持标记
+    supports_background_change: true
+    supports_pose_change: true
+    supports_multi_product: true
+    supports_inpainting: true
+
+  # Stable Diffusion Inpainting（适合局部编辑）
+  stable_diffusion:
+    type: stable_diffusion
+    api_key: your-stability-api-key
+    base_url: https://api.stability.ai
+    model: stable-diffusion-xl-1024-v1-0
+    # SD 特有参数
+    cfg_scale: 7
+    steps: 30
+    # 功能支持标记
+    supports_background_change: true
+    supports_pose_change: false
+    supports_multi_product: false
+    supports_inpainting: true

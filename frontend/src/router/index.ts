@@ -5,6 +5,9 @@ import GenerateView from '../views/GenerateView.vue'
 import ResultView from '../views/ResultView.vue'
 import HistoryView from '../views/HistoryView.vue'
 import SettingsView from '../views/SettingsView.vue'
+import TemplateManageView from '../views/TemplateManageView.vue'
+import ProductPhotoView from '../views/ProductPhotoView.vue'
+import ProductPhotoEditView from '../views/ProductPhotoEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +46,21 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: SettingsView
+    },
+    {
+      path: '/templates',
+      name: 'templates',
+      component: TemplateManageView
+    },
+    {
+      path: '/product-photo',
+      name: 'product-photo',
+      component: ProductPhotoView
+    },
+    {
+      path: '/product-photo/edit/:taskId/:imageIndex',
+      name: 'product-photo-edit',
+      component: ProductPhotoEditView
     }
   ]
 })

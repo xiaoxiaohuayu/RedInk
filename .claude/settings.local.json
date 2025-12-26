@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp:*)",
+      "Bash(uv sync:*)",
+      "Bash(pnpm install:*)",
+      "Bash(uv run:*)",
+      "Bash(pnpm dev)",
+      "Bash(lsof:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": []
+  }
+}

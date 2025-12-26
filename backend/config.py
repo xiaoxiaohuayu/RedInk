@@ -14,6 +14,7 @@ class Config:
 
     _image_providers_config = None
     _text_providers_config = None
+    _product_photo_providers_config = None
 
     @classmethod
     def load_image_providers_config(cls):
@@ -146,8 +147,106 @@ class Config:
         return provider_config
 
     @classmethod
+    def load_product_photo_providers_config(cls):
+        """加载产品图生成服务商配置"""
+        if cls._product_photo_providers_config is not None:
+            return cls._product_photo_providers_config
+
+        config_path = Path(__file__).parent.parent / 'product_photo_providers.yaml'
+        logger.debug(f"加载产品图服务商配置: {config_path}")
+
+        if not config_path.exists():
+            logger.warning(f"产品图配置文件不存在: {config_path}，使用默认配置")
+            cls._product_photo_providers_config = {
+                'active_provider': 'openai_compatible',
+                'providers': {}
+            }
+            return cls._product_photo_providers_config
+
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                cls._product_photo_providers_config = yaml.safe_load(f) or {}
+            logger.debug(f"产品图配置加载成功: {list(cls._product_photo_providers_config.get('providers', {}).keys())}")
+        except yaml.YAMLError as e:
+            logger.error(f"产品图配置文件 YAML 格式错误: {e}")
+            raise ValueError(
+                f"配置文件格式错误: product_photo_providers.yaml\n"
+                f"YAML 解析错误: {e}\n"
+                "解决方案：\n"
+                "1. 检查 YAML 缩进是否正确（使用空格，不要用Tab）\n"
+                "2. 检查引号是否配对\n"
+                "3. 使用在线 YAML 验证器检查格式"
+            )
+
+        return cls._product_photo_providers_config
+
+    @classmethod
+    def get_active_product_photo_provider(cls):
+        """获取当前激活的产品图生成服务商"""
+        config = cls.load_product_photo_providers_config()
+        active = config.get('active_provider', 'openai_compatible')
+        logger.debug(f"当前激活的产品图服务商: {active}")
+        return active
+
+    @classmethod
+    def get_product_photo_provider_config(cls, provider_name: str = None):
+        """获取产品图生成服务商配置"""
+        config = cls.load_product_photo_providers_config()
+
+        if provider_name is None:
+            provider_name = cls.get_active_product_photo_provider()
+
+        logger.info(f"获取产品图服务商配置: {provider_name}")
+
+        providers = config.get('providers', {})
+        if not providers:
+            raise ValueError(
+                "未找到任何产品图生成服务商配置。\n"
+                "解决方案：\n"
+                "1. 复制 product_photo_providers.yaml.example 为 product_photo_providers.yaml\n"
+                "2. 填写服务商的 API Key 等配置\n"
+                "3. 确保文件中有 providers 字段"
+            )
+
+        if provider_name not in providers:
+            available = ', '.join(providers.keys()) if providers else '无'
+            logger.error(f"产品图服务商 [{provider_name}] 不存在，可用服务商: {available}")
+            raise ValueError(
+                f"未找到产品图生成服务商配置: {provider_name}\n"
+                f"可用的服务商: {available}\n"
+                "解决方案：\n"
+                "1. 在 product_photo_providers.yaml 中添加该服务商配置\n"
+                "2. 或修改 active_provider 为已存在的服务商"
+            )
+
+        provider_config = providers[provider_name].copy()
+
+        # 验证必要字段
+        if not provider_config.get('api_key'):
+            logger.error(f"产品图服务商 [{provider_name}] 未配置 API Key")
+            raise ValueError(
+                f"服务商 {provider_name} 未配置 API Key\n"
+                "解决方案：\n"
+                "1. 在 product_photo_providers.yaml 中为该服务商添加 api_key 字段"
+            )
+
+        provider_type = provider_config.get('type', provider_name)
+        if provider_type in ['openai_compatible', 'kolors_virtual_tryon', 'kling_ai', 'stable_diffusion']:
+            if not provider_config.get('base_url'):
+                logger.error(f"产品图服务商 [{provider_name}] 类型为 {provider_type}，但未配置 base_url")
+                raise ValueError(
+                    f"服务商 {provider_name} 未配置 Base URL\n"
+                    f"服务商类型 {provider_type} 需要配置 base_url\n"
+                    "解决方案：在 product_photo_providers.yaml 中为该服务商添加 base_url 字段"
+                )
+
+        logger.info(f"产品图服务商配置验证通过: {provider_name} (type={provider_type})")
+        return provider_config
+
+    @classmethod
     def reload_config(cls):
         """重新加载配置（清除缓存）"""
         logger.info("重新加载所有配置...")
         cls._image_providers_config = None
         cls._text_providers_config = None
+        cls._product_photo_providers_config = None

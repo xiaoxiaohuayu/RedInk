@@ -26,6 +26,9 @@ def create_api_blueprint():
     from .image_routes import create_image_blueprint
     from .history_routes import create_history_blueprint
     from .config_routes import create_config_blueprint
+    from .product_photo_routes import create_product_photo_blueprint
+    from .template_routes import create_template_blueprint
+    from .edit_routes import create_edit_blueprint
 
     # 创建主 API 蓝图
     api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -35,6 +38,9 @@ def create_api_blueprint():
     api_bp.register_blueprint(create_image_blueprint())
     api_bp.register_blueprint(create_history_blueprint())
     api_bp.register_blueprint(create_config_blueprint())
+    api_bp.register_blueprint(create_product_photo_blueprint())
+    api_bp.register_blueprint(create_template_blueprint())
+    api_bp.register_blueprint(create_edit_blueprint())
 
     return api_bp
 
